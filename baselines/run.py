@@ -2,6 +2,7 @@ import sys
 import re
 import multiprocessing
 import os.path as osp
+from os.path import realpath
 import gym
 from collections import defaultdict
 import tensorflow as tf
@@ -13,6 +14,9 @@ from baselines.common.cmd_util import common_arg_parser, parse_unknown_args, mak
 from baselines.common.tf_util import get_session
 from baselines import logger
 from importlib import import_module
+
+sys.path.append(realpath('.'))
+import mapping
 
 try:
     from mpi4py import MPI
@@ -110,7 +114,8 @@ def build_env(args):
         get_session(config=config)
 
         flatten_dict_observations = alg not in {'her'}
-        env = make_vec_env(env_id, env_type, args.num_env or 1, seed, reward_scale=args.reward_scale, flatten_dict_observations=flatten_dict_observations)
+        env = make_vec_env(env_id, env_type, args.num_env or 1, seed, reward_scale=args.reward_scale, flatten_dict_observations=flatten_dict_observations,
+            env_kwargs={'log_dir': args.log_path})
 
         if env_type == 'mujoco':
             env = VecNormalize(env, use_tf=True)
@@ -239,7 +244,7 @@ def main(args):
             done_any = done.any() if isinstance(done, np.ndarray) else done
             if done_any:
                 for i in np.nonzero(done)[0]:
-                    print('episode_rew={}'.format(episode_rew[i]))
+                    print('episode_rew={}'.format(episode_rew[i]), flush=True)
                     episode_rew[i] = 0
 
     env.close()

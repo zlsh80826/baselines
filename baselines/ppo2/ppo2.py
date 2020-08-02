@@ -18,6 +18,15 @@ def constfn(val):
         return val
     return f
 
+countxx = 0
+
+def decayfn(val):
+    def f(_):
+        global countxx
+        countxx += 1
+        return val * (0.9999**countxx)
+    return f
+
 def learn(*, network, env, total_timesteps, eval_env = None, seed=None, nsteps=2048, ent_coef=0.0, lr=3e-4,
             vf_coef=0.5,  max_grad_norm=0.5, gamma=0.99, lam=0.95,
             log_interval=10, nminibatches=4, noptepochs=4, cliprange=0.2,
@@ -79,7 +88,7 @@ def learn(*, network, env, total_timesteps, eval_env = None, seed=None, nsteps=2
 
     set_global_seeds(seed)
 
-    if isinstance(lr, float): lr = constfn(lr)
+    if isinstance(lr, float): lr = decayfn(lr)
     else: assert callable(lr)
     if isinstance(cliprange, float): cliprange = constfn(cliprange)
     else: assert callable(cliprange)

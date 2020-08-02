@@ -12,6 +12,31 @@ def register(name):
         return func
     return _thunk
 
+
+@register("rnet")
+def rnet(num_units=128, num_layers=2, istrain=False):
+    def network_fn(inputs):
+
+        # LSTMCell, state_is_tuple
+        rnn_cell = [tf.nn.rnn_cell.LSTMCell(num_units=num_units, state_is_tuple=True)
+                    for i in range(num_layers)]
+        rnn_cell = tf.contrib.rnn.MultiRNNCell(rnn_cell)
+        if istrain:
+            rnn_cell = tf.nn.rnn_cell.DropoutWrapper(
+                rnn_cell,
+                input_keep_prob=0.95,
+                output_keep_prob=0.95)
+        initial_state = rnn_cell.zero_state(inputs.shape[0], dtype=tf.float32)
+        outputs, states = tf.nn.dynamic_rnn(cell=rnn_cell,
+                                      inputs=inputs,
+                                      initial_state=initial_state,
+                                      parallel_iterations=4096,
+                                      dtype=tf.float32)
+        return outputs
+
+    return network_fn
+
+
 def nature_cnn(unscaled_images, **conv_kwargs):
     """
     CNN from Nature paper.
