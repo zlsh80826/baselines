@@ -55,7 +55,7 @@ class Environment(Env):
         self.current_src = self.steps = -1
         self.prev_sim_time = None
         self.current_map = None
-        self.elf = 'simgrids/src/latency.smpi'
+        self.elf = '/data/src/latency.smpi'
 
         self.observation_space = Box(
             low=-np.inf, high=np.inf,
@@ -86,16 +86,16 @@ class Environment(Env):
                           # '--cfg=tracing/smpi/internals:yes']
         self.trace_opts = ['-trace', '-trace-file', self.trace_file]
         self.exe = os.path.join(tempdir.name, 'exe')
-        shutil.copyfile('simgrids/xmldescs/torus2D/4-3/platform.xml', self.platform_file)
-        shutil.copyfile('simgrids/src/latency.smpi', self.exe)
+        shutil.copyfile('/data/xmldescs/torus2D/12/platform.xml', self.platform_file)
+        shutil.copyfile('/data/src/latency.smpi', self.exe)
 
     def get_cases(self):
         """
         return the testcases base on training mode
         """
         if self.istrain:
-            return os.path.join(os.getcwd(), f'simgrids/testcases/beta-12-train/{self.tid}.in')
-        return os.path.join(os.getcwd(), f'simgrids/testcases/12/beta-distribution/{self.tid}.in')
+            return os.path.join(os.getcwd(), f'/data/testcases/sample-train/{self.tid}.in')
+        return os.path.join(os.getcwd(), f'/data/testcases/sample-test/{self.tid}.in')
 
     def run_simgrid(self):
         """
@@ -106,7 +106,7 @@ class Environment(Env):
             cmd = ['smpirun', '-np', str(self.num_jobs), *self.trace_opts,
                    *self.smpi_opts, '-platform', self.platform_file,
                    '-hostfile', hostfile, self.exe, self.get_cases()]
-            result = subprocess.run(cmd, cwd=self.tempdir.name, capture_output=True, check=True)
+            result = subprocess.run(cmd, cwd=self.tempdir.name, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         sim_time = float([x for x in result.stderr.decode('ascii').splitlines()
                           if 'Simulated time' in x][0].split()[4])
         return sim_time
