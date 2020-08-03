@@ -1,14 +1,13 @@
 #!/bin/bash
 
-export CUDA_VISIBLE_DEVICES=1
 export TF_XLA_FLAGS=--tf_xla_cpu_global_jit
 export ISTRAIN=""
-export NUM_SWAPS=512
+export NUM_SWAPS=12
 
 MODEL_NAME=env8
 mkdir -p plogs/${MODEL_NAME}
 
-for i in 00001 {01000..03000..1000}; # {01000..10000..1000};
+for i in 00001;
 do
 SAVE_NAME=ckpt${i}
 
