@@ -40,6 +40,8 @@ class Environment(Env):
 
         self.istrain = bool(os.environ['ISTRAIN'])
         self.create_run_envs()
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
         logging.basicConfig(
             format='%(message)s',
             filename=os.path.join(log_dir, 'runtime-{}'.format(self.uuid)),
@@ -50,7 +52,7 @@ class Environment(Env):
         self.num_nodes = self.num_jobs = 12
         self.num_swaps = num_swaps
         self.num_train = 1000000
-        self.num_eval = 100
+        self.num_eval = 5 
         self.tid = 0 
         self.current_src = self.steps = -1
         self.prev_sim_time = None

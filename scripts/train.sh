@@ -9,7 +9,7 @@ MODEL_NAME='env8'
 # TODO: save path add train keyword
 python -W ignore -m baselines.run --alg=ppo2 \
                         --env=Mapping-v0 \
-                        --num_timesteps=1e2 \
+                        --num_timesteps=1024 \
                         --save_path=models/${MODEL_NAME} \
                         --log_path=logs/${MODEL_NAME}/train \
                         --save_interval=100 \
